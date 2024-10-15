@@ -1,0 +1,114 @@
+# Listas para armazenar enfermeiros, pacientes e consultas
+enfermeiros = []
+pacientes = []
+consultas = []
+
+# ENFERMEIROS
+def cadastrarEnfermeiro():
+    nome = input("Digite o nome do enfermeiro: ")
+    coren = input("Digite o número do COREN: ")
+    enfermeiros.append({'nome': nome, 'coren': coren})
+
+# PACIENTE
+def cadastrarPaciente():
+    cpf = input("Digite o CPF do paciente: ")
+    nome = input("Digite o nome do paciente: ")
+    data_nascimento = input("Digite a data de nascimento (dd/mm/aaaa): ")
+    pacientes.append({'cpf': cpf, 'nome': nome, 'data_nascimento': data_nascimento})
+
+# IMC
+def calcular_imc(peso, altura):
+    imc = peso / (altura ** 2)
+    if imc < 18.5:
+        classificacao = "Baixo peso"
+    elif 18.5 <= imc < 25:
+        classificacao = "Normal"
+    elif 25 <= imc < 30:
+        classificacao = "Sobrepeso"
+    else:
+        classificacao = "Obesidade"
+    return imc, classificacao
+
+# CONSULTA
+def cadastrarConsulta():
+    cpf = input("Digite o CPF do paciente: ")
+    nomeEnf = input("Digite o nome do enfermeiro: ")
+    peso = float(input("Digite o peso (kg): "))
+    altura = float(input("Digite a altura (m): "))
+    spo2 = int(input("Digite a saturação de SPO₂: "))
+    fc = int(input("Digite a frequência cardíaca (FC): "))
+    has = str(input("Tem HAS (S/N): "))
+    dm = str(input("Tem DM (S/N): "))
+    
+    imc, classifica_imc = calcular_imc(peso, altura)
+    
+    consulta = {
+        'cpf': cpf, 'enfermeiro': nomeEnf, 'peso': peso, 'altura': altura,
+        'spo2': spo2, 'fc': fc, 'has': has, 'dm': dm, 'imc': imc, 'classificacao_imc': classifica_imc
+    }
+    consultas.append(consulta)
+    print(f"Consulta registrada para {cpf} com IMC: {imc:.2f} - {classifica_imc}")
+
+# Função para imprimir o relatório
+def imprimir_relatorio():
+    with open('relatorio_rsti.txt', 'w') as arquivo:
+        for consulta in consultas:
+            arquivo.write(f"Paciente CPF: {consulta['cpf']}\n")
+            arquivo.write(f"Enfermeiro: {consulta['enfermeiro']}\n")
+            arquivo.write(f"Peso: {consulta['peso']} kg, Altura: {consulta['altura']} m\n")
+            arquivo.write(f"IMC: {consulta['imc']:.2f}, Classificação: {consulta['classificacao_imc']}\n")
+            arquivo.write(f"SPO₂: {consulta['spo2']}, FC: {consulta['fc']}\n")
+            arquivo.write(f"HAS: {'Sim' if consulta['has'] else 'Não'}, DM: {'Sim' if consulta['dm'] else 'Não'}\n")
+            arquivo.write("\n")
+    print("Relatório salvo como 'relatorio_rsti.txt'.")
+
+# MÉDIAS
+def mediasPacientes():
+    total_consultas = len(consultas)
+    has_dm = [c for c in consultas if c['has'] or c['dm']]
+    percent_has_dm = (len(has_dm) / total_consultas) * 100 if total_consultas > 0 else 0
+    
+    pesos = [c['peso'] for c in consultas]
+    alturas = [c['altura'] for c in consultas]
+    
+    if pesos:
+        peso_max = max(pesos)
+        peso_min = min(pesos)
+        print(f"Maior peso: {peso_max} kg, Menor peso: {peso_min} kg")
+    
+    if alturas:
+        altura_max = max(alturas)
+        altura_min = min(alturas)
+        print(f"Maior altura: {altura_max} m, Menor altura: {altura_min} m")
+    
+    print(f"Total de consultas: {total_consultas}")
+    print(f"Porcentagem de pacientes com HAS ou DM: {percent_has_dm:.2f}%")
+
+# Função do menu
+def menu():
+    while True:
+        print("\n**** Sistema UPA Santa Maria *****")
+        print("1. Cadastrar Enfermeiro")
+        print("2. Cadastrar Paciente")
+        print("3. Registrar Consulta")
+        print("4. Imprimir Relatório")
+        print("5. Médias de Pacientes")
+        print("Digite SAIR para encerrar")
+        
+        opcao = input("Escolha uma opção: ")
+        
+        if opcao == '1':
+            cadastrarEnfermeiro()
+        elif opcao == '2':
+            cadastrarPaciente()
+        elif opcao == '3':
+            cadastrarConsulta()
+        elif opcao == '4':
+            imprimir_relatorio()
+        elif opcao == '5':
+            mediasPacientes()
+        elif opcao.lower() == 'SAIR':
+            print("Saindo do sistema...")
+            break
+        
+menu()
